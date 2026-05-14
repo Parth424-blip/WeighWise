@@ -1,0 +1,159 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #070b14;
+  color: #f5f7ff;
+  font-family: Inter, sans-serif;
+  min-height: 100vh;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+#root {
+  width: 100%;
+  max-width: 900px;
+}
+
+.app-container {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+form {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+input {
+  flex: 1;
+  min-width: 180px;
+
+  background: #0b1220;
+  border: 1px solid #253046;
+  color: white;
+
+  padding: 14px 16px;
+  border-radius: 14px;
+
+  outline: none;
+  font-size: 0.95rem;
+
+  transition: border 0.2s ease;
+}
+
+input:focus {
+  border-color: #5b8cff;
+}
+
+button {
+  background: #5b8cff;
+  color: white;
+
+  border: none;
+  border-radius: 14px;
+
+  padding: 14px 20px;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.chart-container {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+
+  border-radius: 20px;
+
+  padding: 24px;
+
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 32px;
+}
+
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.entry-card {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+
+  border-radius: 16px;
+
+  padding: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry-date {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.entry-weight {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.delete-btn {
+  background: #ef4444;
+}
+
+.delete-btn:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .chart-container {
+    overflow-x: auto;
+  }
+}
