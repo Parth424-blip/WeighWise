@@ -26,7 +26,10 @@ function App() {
 
   function handleSubmit(e) {
     e.preventDefault();
-
+    if (weight <= 0 || date === "") {
+      alert("Please enter a valid weight and date");
+      return;
+    }
     const newEntry = {
       id: Date.now(),
       weight: Number(weight),
@@ -47,10 +50,32 @@ function App() {
     return new Date(a.date) - new Date(b.date);
   });
 
+  const latestWeight = sortedEntries[0]?.weight || "N/A";
+  const allWeight = sortedEntries.map((entry) => entry.weight) || [];
+
+  const lowestWeight = allWeight.length > 0 ? Math.min(...allWeight) : "N/A";
+  const highestWeight = allWeight.length > 0 ? Math.max(...allWeight) : "N/A";
+  const stats = [
+    {
+      label: "Latest Weight",
+      value: latestWeight,
+    },
+    {
+      label: "Lowest Weight",
+      value: lowestWeight,
+    },
+    {
+      label: "Highest Weight",
+      value: highestWeight,
+    },
+    {
+      label: "Total Entries",
+      value: entries.length,
+    },
+  ];
+
   return (
     <div className="app-container">
-      <h1>Weight Tracker</h1>
-
       <form onSubmit={handleSubmit}>
         <input
           type="number"
@@ -71,28 +96,39 @@ function App() {
 
         <button type="submit">Submit</button>
       </form>
-
-      <div className="chart-container">
-        <LineChart width={700} height={250} data={sortedEntries}>
-          <CartesianGrid strokeDasharray="3 3" />
-
-          <XAxis
-            dataKey="date"
-            tickFormatter={(date) => new Date(date).toLocaleDateString()}
-          />
-
-          <YAxis />
-
-          <Tooltip />
-
-          <Line
-            type="monotone"
-            dataKey="weight"
-            stroke="#8884d8"
-            strokeWidth={3}
-          />
-        </LineChart>
+      <div className="stats-section">
+        {stats.map((stat) => (
+          <div className="stat-card" key={stat.label}>
+            <div className="stat-label">{stat.label}</div>
+            <div className="stat-value">{stat.value}</div>
+          </div>
+        ))}
       </div>
+      {entries.length === 0 ? (
+        <p>Your weight progress chart will appear here</p>
+      ) : (
+        <div className="chart-container">
+          <LineChart width={700} height={250} data={sortedEntries}>
+            <CartesianGrid strokeDasharray="3 3" />
+
+            <XAxis
+              dataKey="date"
+              tickFormatter={(date) => new Date(date).toLocaleDateString()}
+            />
+
+            <YAxis />
+
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="weight"
+              stroke="#8884d8"
+              strokeWidth={3}
+            />
+          </LineChart>
+        </div>
+      )}
 
       <div className="entries-list">
         {entries.map((entry) => (
