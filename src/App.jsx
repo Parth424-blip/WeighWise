@@ -7,6 +7,7 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 
 import "./App.css";
@@ -14,18 +15,26 @@ import "./App.css";
 function App() {
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState("");
-  const [entries, setEntries] = useState([]);
-  const [goalWeight, setGoalWeight] = useState(0);
-  const [goalDate, setGoalDate] = useState("");
-
-  useEffect(() => {
-    const prevEntries = JSON.parse(localStorage.getItem("entries")) || [];
-    const prevGoalWeight = JSON.parse(localStorage.getItem("goalWeight")) || 0;
-    const prevGoalDate = JSON.parse(localStorage.getItem("goalDate")) || "";
-    setEntries(prevEntries);
-    setGoalWeight(Number(prevGoalWeight));
-    setGoalDate(prevGoalDate);
-  }, []);
+  const [entries, setEntries] = useState(() => {
+    const saved = localStorage.getItem("entries");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [goalWeight, setGoalWeight] = useState(() => {
+    const saved = localStorage.getItem("goalWeight");
+    return saved ? JSON.parse(saved) : 0;
+  });
+  const [goalDate, setGoalDate] = useState(() => {
+    const saved = localStorage.getItem("goalDate");
+    return saved ? JSON.parse(saved) : "";
+  });
+  const [inputGoalWeight, setInputGoalWeight] = useState(() => {
+    const saved = localStorage.getItem("goalWeight");
+    return saved ? JSON.parse(saved) : "";
+  });
+  const [inputGoalDate, setInputGoalDate] = useState(() => {
+    const saved = localStorage.getItem("goalDate");
+    return saved ? JSON.parse(saved) : "";
+  });
 
   useEffect(() => {
     localStorage.setItem("entries", JSON.stringify(entries));
@@ -58,10 +67,19 @@ function App() {
   }
   function handleGoalSubmit(e) {
     e.preventDefault();
-    if (goalWeight <= 0 || goalDate == "") {
+    if (inputGoalWeight <= 0 || inputGoalDate === "") {
       alert("Please enter a valid weight and date");
       return;
     }
+    setGoalWeight(Number(inputGoalWeight));
+    setGoalDate(inputGoalDate);
+  }
+
+  function handleRemoveGoal() {
+    setGoalWeight(0);
+    setGoalDate("");
+    setInputGoalWeight("");
+    setInputGoalDate("");
   }
 
   const sortedEntries = [...entries].sort((a, b) => {
@@ -97,45 +115,79 @@ function App() {
       <div className="header">
         <h1>WeighWise</h1>
         <p className="subtitle">Track your weight journey with simplicity</p>
+        {goalWeight > 0 && (
+          <div className="goal-banner">
+            🎯 Target: <strong>{goalWeight} kg</strong>
+            {goalDate && (
+              <span>
+                {" "}
+                by{" "}
+                <strong>
+                  {new Date(goalDate).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </strong>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          step="0.1"
-          placeholder="Enter weight (kg)"
-          value={weight}
-          onChange={(e) => {
-            setWeight(e.target.value);
-          }}
-        />
+      <div className="forms-container">
+        <div className="form-wrapper">
+          <div className="form-title">Log Daily Weight</div>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="number"
+              step="0.1"
+              placeholder="Enter weight (kg)"
+              value={weight}
+              onChange={(e) => {
+                setWeight(e.target.value);
+              }}
+            />
 
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => {
-            setDate(e.target.value);
-          }}
-        />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => {
+                setDate(e.target.value);
+              }}
+            />
 
-        <button type="submit">Add Entry</button>
-      </form>
-      <form onSubmit={handleGoalSubmit}>
-        <input
-          type="number"
-          step="0.1"
-          value={goalWeight}
-          onChange={(e) => setGoalWeight(e.target.value)}
-          placeholder="Enter Goal Weight (kg)"
-        />
-        <input
-          type="date"
-          value={goalDate}
-          onChange={(e) => setGoalDate(e.target.value)}
-          placeholder="Enter Goal Date"
-        />
-        <button type="submit">Set Goal</button>
-      </form>
+            <button type="submit">Add Entry</button>
+          </form>
+        </div>
+
+        <div className="form-wrapper">
+          <div className="form-title">Target Goal</div>
+          <form onSubmit={handleGoalSubmit} className="goal-form">
+            <input
+              type="number"
+              step="0.1"
+              value={inputGoalWeight}
+              onChange={(e) => setInputGoalWeight(e.target.value)}
+              placeholder="Enter Goal Weight (kg)"
+            />
+            <input
+              type="date"
+              value={inputGoalDate}
+              onChange={(e) => setInputGoalDate(e.target.value)}
+              placeholder="Enter Goal Date"
+            />
+            <button type="submit" className="goal-btn">
+              Set Goal
+            </button>
+            {goalWeight > 0 && (
+              <button type="button" className="remove-goal-btn" onClick={handleRemoveGoal}>
+                Remove
+              </button>
+            )}
+          </form>
+        </div>
+      </div>
 
       <div className="stats-section">
         {stats.map((stat) => (
@@ -170,6 +222,19 @@ function App() {
                 vertical={false}
                 stroke="var(--border-color)"
               />
+              {goalWeight > 0 && (
+                <ReferenceLine
+                  y={goalWeight}
+                  stroke="var(--text-secondary)"
+                  strokeDasharray="3 3"
+                  label={{
+                    position: "top",
+                    value: "Goal",
+                    fill: "var(--text-secondary)",
+                    fontSize: 12,
+                  }}
+                />
+              )}
               <XAxis
                 dataKey="date"
                 tickFormatter={(date) =>

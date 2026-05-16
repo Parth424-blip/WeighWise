@@ -85,6 +85,24 @@ h1 {
   font-weight: 400;
 }
 
+.goal-banner {
+  display: inline-block;
+  margin-top: 1.25rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.goal-banner strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 form {
   display: flex;
   gap: 1rem;
@@ -141,6 +159,66 @@ button {
 button:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
+}
+
+.forms-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .forms-container {
+    flex-direction: row;
+  }
+  .form-wrapper {
+    flex: 1;
+  }
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 0.5rem;
+}
+
+.goal-form {
+  background: var(--bg-color);
+  border: 1px dashed var(--text-secondary);
+  box-shadow: none;
+}
+
+.goal-form .goal-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-secondary);
+}
+
+.goal-form .goal-btn:hover {
+  background: var(--surface-color);
+  border-color: var(--text-primary);
+}
+
+.goal-form .remove-goal-btn {
+  background: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.goal-form .remove-goal-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--danger-hover);
+  color: var(--danger-hover);
 }
 
 .stats-section {
