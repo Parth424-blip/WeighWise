@@ -6,7 +6,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 
 import "./App.css";
@@ -15,15 +15,25 @@ function App() {
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState("");
   const [entries, setEntries] = useState([]);
+  const [goalWeight, setGoalWeight] = useState(0);
+  const [goalDate, setGoalDate] = useState("");
 
   useEffect(() => {
     const prevEntries = JSON.parse(localStorage.getItem("entries")) || [];
+    const prevGoalWeight = JSON.parse(localStorage.getItem("goalWeight")) || 0;
+    const prevGoalDate = JSON.parse(localStorage.getItem("goalDate")) || "";
     setEntries(prevEntries);
+    setGoalWeight(Number(prevGoalWeight));
+    setGoalDate(prevGoalDate);
   }, []);
 
   useEffect(() => {
     localStorage.setItem("entries", JSON.stringify(entries));
   }, [entries]);
+  useEffect(() => {
+    localStorage.setItem("goalWeight", JSON.stringify(goalWeight));
+    localStorage.setItem("goalDate", JSON.stringify(goalDate));
+  }, [goalWeight, goalDate]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -45,6 +55,13 @@ function App() {
 
   function handleDeleteEntry(id) {
     setEntries(entries.filter((entry) => entry.id !== id));
+  }
+  function handleGoalSubmit(e) {
+    e.preventDefault();
+    if (goalWeight <= 0 || goalDate == "") {
+      alert("Please enter a valid weight and date");
+      return;
+    }
   }
 
   const sortedEntries = [...entries].sort((a, b) => {
@@ -103,13 +120,30 @@ function App() {
 
         <button type="submit">Add Entry</button>
       </form>
+      <form onSubmit={handleGoalSubmit}>
+        <input
+          type="number"
+          step="0.1"
+          value={goalWeight}
+          onChange={(e) => setGoalWeight(e.target.value)}
+          placeholder="Enter Goal Weight (kg)"
+        />
+        <input
+          type="date"
+          value={goalDate}
+          onChange={(e) => setGoalDate(e.target.value)}
+          placeholder="Enter Goal Date"
+        />
+        <button type="submit">Set Goal</button>
+      </form>
 
       <div className="stats-section">
         {stats.map((stat) => (
           <div className="stat-card" key={stat.label}>
             <div className="stat-label">{stat.label}</div>
             <div className="stat-value">
-              {stat.value} {stat.value !== "N/A" && stat.label !== "Total Entries" && "kg"}
+              {stat.value}{" "}
+              {stat.value !== "N/A" && stat.label !== "Total Entries" && "kg"}
             </div>
           </div>
         ))}
@@ -117,36 +151,70 @@ function App() {
 
       {entries.length === 0 ? (
         <div className="empty-state">
-          <p>Your weight progress chart will appear here once you add an entry.</p>
+          <p>
+            Your weight progress chart will appear here once you add an entry.
+          </p>
         </div>
       ) : (
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={sortedEntries} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+        <div
+          className="chart-container"
+          style={{ width: "100%", minWidth: 0, overflow: "hidden" }}
+        >
+          <ResponsiveContainer width="99%" height={300}>
+            <LineChart
+              data={sortedEntries}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border-color)"
+              />
               <XAxis
                 dataKey="date"
-                tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                tickFormatter={(date) =>
+                  new Date(date).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }
                 stroke="var(--text-secondary)"
-                tick={{ fill: 'var(--text-secondary)' }}
+                tick={{ fill: "var(--text-secondary)" }}
                 tickMargin={10}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--text-secondary)"
-                tick={{ fill: 'var(--text-secondary)' }}
+                tick={{ fill: "var(--text-secondary)" }}
                 tickMargin={10}
-                domain={['dataMin - 2', 'dataMax + 2']}
+                domain={["dataMin - 2", "dataMax + 2"]}
               />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-md)', backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)' }}
-                itemStyle={{ color: 'var(--text-primary)' }}
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "var(--shadow-md)",
+                  backgroundColor: "var(--surface-color)",
+                  color: "var(--text-primary)",
+                }}
+                itemStyle={{ color: "var(--text-primary)" }}
+                formatter={(value) => {
+                  return `${value}kg`;
+                }}
+                labelFormatter={(label) =>
+                  new Date(label).toLocaleDateString(undefined, {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                }
               />
               <Line
                 type="monotone"
                 dataKey="weight"
                 stroke="var(--chart-line)"
                 strokeWidth={3}
-                dot={{ r: 4, fill: 'var(--chart-line)', strokeWidth: 0 }}
+                dot={{ r: 4, fill: "var(--chart-line)", strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 0 }}
               />
             </LineChart>
@@ -155,23 +223,31 @@ function App() {
       )}
 
       <div className="entries-list">
-        {sortedEntries.slice().reverse().map((entry) => (
-          <div className="entry-card" key={entry.id}>
-            <div className="entry-info">
-              <div className="entry-weight">{entry.weight} kg</div>
-              <div className="entry-date">
-                {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+        {sortedEntries
+          .slice()
+          .reverse()
+          .map((entry) => (
+            <div className="entry-card" key={entry.id}>
+              <div className="entry-info">
+                <div className="entry-weight">{entry.weight} kg</div>
+                <div className="entry-date">
+                  {new Date(entry.date).toLocaleDateString(undefined, {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </div>
               </div>
-            </div>
 
-            <button
-              className="delete-btn"
-              onClick={() => handleDeleteEntry(entry.id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteEntry(entry.id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );
