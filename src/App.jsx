@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  ResponsiveContainer
 } from "recharts";
 
 import "./App.css";
@@ -50,7 +51,7 @@ function App() {
     return new Date(a.date) - new Date(b.date);
   });
 
-  const latestWeight = sortedEntries[0]?.weight || "N/A";
+  const latestWeight = sortedEntries[sortedEntries.length - 1]?.weight || "N/A";
   const allWeight = sortedEntries.map((entry) => entry.weight) || [];
 
   const lowestWeight = allWeight.length > 0 ? Math.min(...allWeight) : "N/A";
@@ -76,10 +77,16 @@ function App() {
 
   return (
     <div className="app-container">
+      <div className="header">
+        <h1>WeighWise</h1>
+        <p className="subtitle">Track your weight journey with simplicity</p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <input
           type="number"
-          placeholder="Enter weight"
+          step="0.1"
+          placeholder="Enter weight (kg)"
           value={weight}
           onChange={(e) => {
             setWeight(e.target.value);
@@ -94,51 +101,67 @@ function App() {
           }}
         />
 
-        <button type="submit">Submit</button>
+        <button type="submit">Add Entry</button>
       </form>
+
       <div className="stats-section">
         {stats.map((stat) => (
           <div className="stat-card" key={stat.label}>
             <div className="stat-label">{stat.label}</div>
-            <div className="stat-value">{stat.value}</div>
+            <div className="stat-value">
+              {stat.value} {stat.value !== "N/A" && stat.label !== "Total Entries" && "kg"}
+            </div>
           </div>
         ))}
       </div>
+
       {entries.length === 0 ? (
-        <p>Your weight progress chart will appear here</p>
+        <div className="empty-state">
+          <p>Your weight progress chart will appear here once you add an entry.</p>
+        </div>
       ) : (
         <div className="chart-container">
-          <LineChart width={700} height={250} data={sortedEntries}>
-            <CartesianGrid strokeDasharray="3 3" />
-
-            <XAxis
-              dataKey="date"
-              tickFormatter={(date) => new Date(date).toLocaleDateString()}
-            />
-
-            <YAxis />
-
-            <Tooltip />
-
-            <Line
-              type="monotone"
-              dataKey="weight"
-              stroke="#8884d8"
-              strokeWidth={3}
-            />
-          </LineChart>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={sortedEntries} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                stroke="var(--text-secondary)"
+                tick={{ fill: 'var(--text-secondary)' }}
+                tickMargin={10}
+              />
+              <YAxis 
+                stroke="var(--text-secondary)"
+                tick={{ fill: 'var(--text-secondary)' }}
+                tickMargin={10}
+                domain={['dataMin - 2', 'dataMax + 2']}
+              />
+              <Tooltip 
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: 'var(--shadow-md)', backgroundColor: 'var(--surface-color)', color: 'var(--text-primary)' }}
+                itemStyle={{ color: 'var(--text-primary)' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="weight"
+                stroke="var(--chart-line)"
+                strokeWidth={3}
+                dot={{ r: 4, fill: 'var(--chart-line)', strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
 
       <div className="entries-list">
-        {entries.map((entry) => (
+        {sortedEntries.slice().reverse().map((entry) => (
           <div className="entry-card" key={entry.id}>
             <div className="entry-info">
-              <div className="entry-date">
-                {new Date(entry.date).toLocaleDateString()}
-              </div>
-
               <div className="entry-weight">{entry.weight} kg</div>
+              <div className="entry-date">
+                {new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+              </div>
             </div>
 
             <button
