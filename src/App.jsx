@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import {
   LineChart,
   Line,
@@ -15,6 +16,8 @@ import "./App.css";
 function App() {
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [entryToDelete, setEntryToDelete] = useState(null);
   const [entries, setEntries] = useState(() => {
     const saved = localStorage.getItem("entries");
     return saved ? JSON.parse(saved) : [];
@@ -35,6 +38,14 @@ function App() {
     const saved = localStorage.getItem("goalDate");
     return saved ? JSON.parse(saved) : "";
   });
+  const [height, setHeight] = useState(() => {
+    const saved = localStorage.getItem("height");
+    return saved ? JSON.parse(saved) : "";
+  });
+  const [inputHeight, setInputHeight] = useState(() => {
+    const saved = localStorage.getItem("height");
+    return saved ? JSON.parse(saved) : "";
+  });
 
   useEffect(() => {
     localStorage.setItem("entries", JSON.stringify(entries));
@@ -43,36 +54,64 @@ function App() {
     localStorage.setItem("goalWeight", JSON.stringify(goalWeight));
     localStorage.setItem("goalDate", JSON.stringify(goalDate));
   }, [goalWeight, goalDate]);
+  
+  useEffect(() => {
+    localStorage.setItem("height", JSON.stringify(height));
+  }, [height]);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (weight <= 0 || date === "") {
-      alert("Please enter a valid weight and date");
+      toast.error("Please enter a valid weight and date");
       return;
     }
-    const newEntry = {
-      id: Date.now(),
-      weight: Number(weight),
-      date: date,
-    };
 
-    setEntries([...entries, newEntry]);
+    if (editingId) {
+      setEntries(
+        entries.map((entry) =>
+          entry.id === editingId
+            ? { ...entry, weight: Number(weight), date: date }
+            : entry
+        )
+      );
+      setEditingId(null);
+      toast.success("Entry updated successfully!");
+    } else {
+      const newEntry = {
+        id: Date.now(),
+        weight: Number(weight),
+        date: date,
+      };
+      setEntries([...entries, newEntry]);
+      toast.success("Entry added successfully!");
+    }
 
     setDate("");
     setWeight("");
   }
 
-  function handleDeleteEntry(id) {
-    setEntries(entries.filter((entry) => entry.id !== id));
+  function handleEditEntry(entry) {
+    setWeight(entry.weight);
+    setDate(entry.date);
+    setEditingId(entry.id);
+  }
+
+  function confirmDelete() {
+    if (entryToDelete) {
+      setEntries(entries.filter((entry) => entry.id !== entryToDelete));
+      setEntryToDelete(null);
+      toast.success("Entry deleted!");
+    }
   }
   function handleGoalSubmit(e) {
     e.preventDefault();
     if (inputGoalWeight <= 0 || inputGoalDate === "") {
-      alert("Please enter a valid weight and date");
+      toast.error("Please enter a valid goal weight and date");
       return;
     }
     setGoalWeight(Number(inputGoalWeight));
     setGoalDate(inputGoalDate);
+    toast.success("Target goal set!");
   }
 
   function handleRemoveGoal() {
@@ -80,6 +119,16 @@ function App() {
     setGoalDate("");
     setInputGoalWeight("");
     setInputGoalDate("");
+  }
+
+  function handleHeightSubmit(e) {
+    e.preventDefault();
+    if (inputHeight <= 0) {
+      toast.error("Please enter a valid height");
+      return;
+    }
+    setHeight(Number(inputHeight));
+    toast.success("Height saved!");
   }
 
   const sortedEntries = [...entries].sort((a, b) => {
@@ -91,6 +140,13 @@ function App() {
 
   const lowestWeight = allWeight.length > 0 ? Math.min(...allWeight) : "N/A";
   const highestWeight = allWeight.length > 0 ? Math.max(...allWeight) : "N/A";
+  
+  let bmi = "N/A";
+  if (latestWeight !== "N/A" && height > 0) {
+    const heightInMeters = height / 100;
+    bmi = (latestWeight / (heightInMeters * heightInMeters)).toFixed(1);
+  }
+
   const stats = [
     {
       label: "Latest Weight",
@@ -108,10 +164,29 @@ function App() {
       label: "Total Entries",
       value: entries.length,
     },
+    {
+      label: "Current BMI",
+      value: bmi,
+    },
   ];
 
   return (
     <div className="app-container">
+      <Toaster position="top-center" />
+      
+      {entryToDelete && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card">
+            <h3>Delete Entry?</h3>
+            <p>Are you sure you want to delete this weight entry? This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={() => setEntryToDelete(null)}>Cancel</button>
+              <button className="delete-btn" onClick={confirmDelete}>Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="header">
         <h1>WeighWise</h1>
         <p className="subtitle">Track your weight journey with simplicity</p>
@@ -157,7 +232,22 @@ function App() {
               }}
             />
 
-            <button type="submit">Add Entry</button>
+            <button type="submit">
+              {editingId ? "Update Entry" : "Add Entry"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => {
+                  setEditingId(null);
+                  setWeight("");
+                  setDate("");
+                }}
+              >
+                Cancel
+              </button>
+            )}
           </form>
         </div>
 
@@ -191,6 +281,21 @@ function App() {
             )}
           </form>
         </div>
+
+        <div className="form-wrapper">
+          <div className="form-title">Your Height</div>
+          <form onSubmit={handleHeightSubmit} className="goal-form">
+            <input
+              type="number"
+              value={inputHeight}
+              onChange={(e) => setInputHeight(e.target.value)}
+              placeholder="Height (cm)"
+            />
+            <button type="submit" className="goal-btn">
+              Save
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="stats-section">
@@ -199,7 +304,7 @@ function App() {
             <div className="stat-label">{stat.label}</div>
             <div className="stat-value">
               {stat.value}{" "}
-              {stat.value !== "N/A" && stat.label !== "Total Entries" && "kg"}
+              {stat.value !== "N/A" && stat.label !== "Total Entries" && stat.label !== "Current BMI" && "kg"}
             </div>
           </div>
         ))}
@@ -309,12 +414,20 @@ function App() {
                 </div>
               </div>
 
-              <button
-                className="delete-btn"
-                onClick={() => handleDeleteEntry(entry.id)}
-              >
-                Delete
-              </button>
+              <div className="entry-actions">
+                <button
+                  className="edit-btn"
+                  onClick={() => handleEditEntry(entry)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => setEntryToDelete(entry.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
       </div>

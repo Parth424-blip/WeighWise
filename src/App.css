@@ -321,8 +321,8 @@ button:active {
 
 .stats-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
 }
 
 .stat-card {
@@ -331,7 +331,7 @@ button:active {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius);
-  padding: 1.75rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -372,7 +372,7 @@ button:active {
 }
 
 .stat-value {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.03em;
@@ -466,6 +466,45 @@ button:active {
   background: var(--accent-gradient);
 }
 
+.entry-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-color);
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  box-shadow: none;
+}
+.edit-btn::after {
+  display: none;
+}
+.edit-btn:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px var(--accent-glow);
+}
+
+.cancel-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--text-secondary);
+  box-shadow: none;
+}
+.cancel-btn::after {
+  display: none;
+}
+.cancel-btn:hover {
+  background: var(--text-secondary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+}
+
 .delete-btn {
   background: rgba(239, 68, 68, 0.1);
   color: var(--danger-color);
@@ -510,8 +549,61 @@ button:active {
     align-items: stretch;
     gap: 1rem;
   }
-  .delete-btn {
+  .entry-actions {
+    flex-direction: column;
     width: 100%;
   }
+  .delete-btn, .edit-btn {
+    width: 100%;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: var(--surface-color);
+  padding: 2.5rem 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md), 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.modal-content p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-actions button {
+  width: 100%;
 }
 
