@@ -60,7 +60,10 @@ Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
 5. Open your browser and visit the local URL provided by Vite (usually `http://localhost:5173`).
 
 ## 🎨 Screenshots
-*(Feel free to add your own screenshots here!)*
+
+![WeighWise App Screenshot](public/screenshot.png)
+
+*(Feel free to add more screenshots here!)*
 
 ## 🤝 Contributing
 
