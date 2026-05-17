@@ -9,9 +9,12 @@ A beautiful, responsive, and intuitive weight tracking web application built wit
 
 ## ✨ Features
 
+- **💎 Premium Glassmorphism Design:** A stunning, vibrant user interface featuring animated gradient backgrounds, frosted-glass effects, and dynamic micro-animations.
 - **📊 Interactive Charting:** Visualize your progress over time with a beautiful, fully responsive line chart powered by Recharts.
-- **🎯 Goal Tracking:** Set a target weight and deadline. WeighWise displays a visual reference line on your chart and a neat progress banner to keep you motivated!
-- **💾 Local Persistence:** All your entries and goals are safely stored locally in your browser using `localStorage`. Your data is available immediately upon your next visit.
+- **🎯 Goal Tracking & BMI Calculator:** Set a target weight and deadline. Enter your height to instantly calculate and track your Body Mass Index (BMI).
+- **✏️ Seamless Data Management:** Log your daily weight and **edit existing entries** on the fly. Accidental clicks are prevented by a sleek **Delete Confirmation Modal**.
+- **🍞 Toast Notifications:** Enjoy smooth, modern popup notifications for success and error states using `react-hot-toast`.
+- **💾 Local Persistence:** All your entries, goals, and personal data are safely stored locally in your browser using `localStorage`. Your data is available immediately upon your next visit.
 - **📱 Fully Responsive:** Carefully crafted CSS ensures the application looks and works perfectly on desktops, tablets, and smartphones.
 - **🌗 Dark Mode Ready:** Automatically adapts to your operating system's color preferences for a sleek, premium look—day or night.
 - **⚡ Fast & Lightweight:** Built using React and Vite with minimal dependencies for a lightning-fast user experience.
@@ -20,8 +23,9 @@ A beautiful, responsive, and intuitive weight tracking web application built wit
 
 - **Core Framework:** [React](https://react.dev/)
 - **Build Tool:** [Vite](https://vitejs.dev/)
-- **Styling:** Vanilla CSS (Responsive with modern CSS Variables)
+- **Styling:** Vanilla CSS (Glassmorphism & animated gradients)
 - **Data Visualization:** [Recharts](https://recharts.org/)
+- **Notifications:** [React Hot Toast](https://react-hot-toast.com/)
 
 ## 🚀 Getting Started
 
