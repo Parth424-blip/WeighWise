@@ -181,7 +181,11 @@ function App() {
               Set Goal
             </button>
             {goalWeight > 0 && (
-              <button type="button" className="remove-goal-btn" onClick={handleRemoveGoal}>
+              <button
+                type="button"
+                className="remove-goal-btn"
+                onClick={handleRemoveGoal}
+              >
                 Remove
               </button>
             )}
